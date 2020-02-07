@@ -49,7 +49,7 @@ const generatedTextInput = document.getElementById('generated-text');
 
 const modelAvailableInfo = document.getElementById('model-available');
 
-const sampleLen = 16;
+const sampleLen = 32;
 const sampleStep = 3;
 
 // Module-global instance of TextData.

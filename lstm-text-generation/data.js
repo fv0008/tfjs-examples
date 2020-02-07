@@ -98,9 +98,10 @@ export class TextData {
     var test = this.textString_
     test.replace(" ","")
     test.replace("_","")
+    test.replace(/[^。\.]+[。\.]{2}/,"\n")
     test = test.split(/[\n\t:。]/)
     for (var i =  test.length -1;i >= 0 ;i--) {
-      if ( test[i] == "") {
+      if ( test[i] == "" || test[i].indexOf("，")==-1) {
         test.splice(i,1);        //执行后aa.length会减一
       }
       else if(test[i].indexOf("，")!=-1)
