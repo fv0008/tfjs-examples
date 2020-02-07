@@ -35,6 +35,7 @@ const loadTextDataButton = document.getElementById('load-text-data');
 const textDataSelect = document.getElementById('text-data-select');
 
 const lstmLayersSizesInput = document.getElementById('lstm-layer-sizes');
+const RnnSizeInput = document.getElementById('rnn-sizes');
 
 const examplesPerEpochInput = document.getElementById('examples-per-epoch');
 const batchSizeInput = document.getElementById('batch-size');
@@ -242,10 +243,12 @@ export function setUpUI() {
 
   function disableModelParameterControls() {
     lstmLayersSizesInput.disabled = true;
+    RnnSizeInput.disable = true
   }
 
   function enableModelParameterControls() {
     lstmLayersSizesInput.disabled = false;
+    RnnSizeInput.disable = false
   }
 
   function updateModelParameterControls(lstmLayerSizes) {

@@ -99,6 +99,7 @@ export class TextData {
     test.replace(" ","")
     test.replace("_","")
     test.replace(/[^。\.]+[。\.]{2}/,"\n")
+    //这里把词句按照第二个句号进行分割，下面的indexOf会抛弃掉所有的名字和作者信息
     test = test.split(/[\n\t:。]/)
     for (var i =  test.length -1;i >= 0 ;i--) {
       if ( test[i] == "" || test[i].indexOf("，")==-1) {
@@ -109,6 +110,7 @@ export class TextData {
         test[i] = test[i] + "。"
       }
     }
+    //这里把文件都整理成五言绝句和七律，并去掉名字和其他注视。
     this.textlist = test
   }
 
