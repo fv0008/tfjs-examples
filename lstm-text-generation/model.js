@@ -74,7 +74,7 @@ export async function fitModel(
     model, textData, numEpochs, examplesPerEpoch, batchSize, validationSplit,
     callbacks) {
   for (let i = 0; i < numEpochs; ++i) {
-    const [xs, ys] = textData.nextDataEpoch(examplesPerEpoch);
+    const [xs, ys] = textData.nextDataEpoch(i , examplesPerEpoch);
     await model.fit(xs, ys, {
       epochs: 1,
       batchSize: batchSize,
@@ -117,7 +117,12 @@ export async function generateText(
 
     // Make the one-hot encoding of the seeding sentence.
     for (let i = 0; i < sampleLen; ++i) {
-      inputBuffer.set(1, 0, i, sentenceIndices[i]);
+      
+      var x = textData.getFromCharSet(sentenceIndices[i])
+      if (undefined!=x) {
+        inputBuffer.set(1, 0, i, sentenceIndices[i]);
+        console.log(i,sentenceIndices[i])
+      }
     }
     const input = inputBuffer.toTensor();
 

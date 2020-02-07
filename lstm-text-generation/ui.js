@@ -49,7 +49,7 @@ const generatedTextInput = document.getElementById('generated-text');
 
 const modelAvailableInfo = document.getElementById('model-available');
 
-const sampleLen = 40;
+const sampleLen = 80;
 const sampleStep = 3;
 
 // Module-global instance of TextData.
@@ -206,6 +206,7 @@ export function setUpUI() {
         seedTextInput.value = seedSentence;
       } else {
         seedSentence = seedTextInput.value;
+        /*
         if (seedSentence.length < textData.sampleLen()) {
           logStatus(
               `ERROR: Seed text must have a length of at least ` +
@@ -214,6 +215,11 @@ export function setUpUI() {
           enableModelButtons();
           return;
         }
+        */
+        if (seedSentence.length != 1) {
+          //return;
+        }
+        /**只需要输入姓 */
         seedSentence = seedSentence.slice(
             seedSentence.length - textData.sampleLen(), seedSentence.length);
         seedSentenceIndices = textData.textToIndices(seedSentence);

@@ -20,16 +20,22 @@ import * as tf from '@tensorflow/tfjs';
 
 // TODO(cais): Support user-supplied text data.
 export const TEXT_DATA_URLS = {
-  'nietzsche': {
+  'names': {
     url:
-        'https://storage.googleapis.com/tfjs-examples/lstm-text-generation/data/nietzsche.txt',
-    needle: 'Nietzsche'
+        //'https://storage.googleapis.com/tfjs-examples/lstm-text-generation/data/nietzsche.txt',
+        './names.txt',
+    //needle: 'Nietzsche'
+    needle: 'names'
+    
   },
-  'julesverne': {
+  'poems': {
     url:
-        'https://storage.googleapis.com/tfjs-examples/lstm-text-generation/data/t1.verne.txt',
-    needle: 'Jules Verne'
+        //'https://storage.googleapis.com/tfjs-examples/lstm-text-generation/data/t1.verne.txt',
+        './poems.txt',
+    //needle: 'Jules Verne'
+    needle: 'poems'
   },
+  /*
   'shakespeare': {
     url:
         'https://storage.googleapis.com/tfjs-examples/lstm-text-generation/data/t8.shakespeare.txt',
@@ -39,6 +45,7 @@ export const TEXT_DATA_URLS = {
     url: 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.11.7/dist/tf.js',
     needle: 'TensorFlow.js Code (Compiled, 0.11.7)'
   }
+  */
 }
 
 /**
@@ -79,10 +86,21 @@ export class TextData {
     this.textLen_ = textString.length;
     this.sampleLen_ = sampleLen;
     this.sampleStep_ = sampleStep;
+    this.textlist = []
 
+    this.splitAllText()
     this.getCharSet_();
     this.convertAllTextToIndices_();
+    
   }
+
+  splitAllText(){
+    var test = this.textString_
+    test.replace(" ","")
+    test.replace("_","")
+    this.textlist = test.split(/[\n\t:]/)
+  }
+
 
   /**
    * Get data identifier.
@@ -127,13 +145,40 @@ export class TextData {
    *   `xs` has the shape of `[numExamples, this.sampleLen, this.charSetSize]`.
    *   `ys` has the shape of `[numExamples, this.charSetSize]`.
    */
-  nextDataEpoch(numExamples) {
+  nextDataEpoch(index,numExamples) {
     this.generateExampleBeginIndices_();
 
     if (numExamples == null) {
       numExamples = this.exampleBeginIndices_.length;
     }
+    var textExamples = ""
+    for(let le = 0; le < this.textlist.length;le++)
+    {
+      textExamples = textExamples + this.textlist[le]
+    }
 
+    const xsBuffer = new tf.TensorBuffer([
+      numExamples, this.sampleLen_,  this.charSetSize_]);
+    const ysBuffer  = new tf.TensorBuffer([numExamples,  this.charSetSize_]);
+
+    var beginIndex = 0
+    for(let le = 0; le < index * numExamples;le++)
+    {
+        beginIndex = beginIndex + this.textlist[le].length
+    }
+
+    for (let i = 0; i < numExamples; ++i) {
+      var curText = this.textlist[index * numExamples + i]
+      
+      for (let j = 0; j < curText.length; ++j) {
+        xsBuffer.set(1, i, j,  this.indices_[ beginIndex+j]);
+        //console.log("j:"+j,this.charSet_[this.indices_[ beginIndex+j]])
+      }
+      beginIndex = beginIndex + curText.length
+      ysBuffer.set(1, i,  this.indices_[beginIndex]);
+      //console.log("i:"+i,this.charSet_[this.indices_[beginIndex]])
+    }
+    /*
     const xsBuffer = new tf.TensorBuffer([
         numExamples, this.sampleLen_, this.charSetSize_]);
     const ysBuffer  = new tf.TensorBuffer([numExamples, this.charSetSize_]);
@@ -146,6 +191,7 @@ export class TextData {
       ysBuffer.set(1, i, this.indices_[beginIndex + this.sampleLen_]);
       this.examplePosition_++;
     }
+    */
     return [xsBuffer.toTensor(), ysBuffer.toTensor()];
   }
 
@@ -180,10 +226,15 @@ export class TextData {
    *   same slice.
    */
   getRandomSlice() {
+    /*
     const startIndex =
         Math.round(Math.random() * (this.textLen_ - this.sampleLen_ - 1));
     const textSlice = this.slice_(startIndex, startIndex + this.sampleLen_);
-    return [textSlice, this.textToIndices(textSlice)];
+    */
+   const startIndex =
+        Math.round(Math.random() * ( this.textlist.length - 1));
+  
+    return [ this.textlist[startIndex], this.textToIndices(this.textlist[startIndex])];
   }
 
   /**
@@ -205,7 +256,7 @@ export class TextData {
     this.charSet_ = [];
     for (let i = 0; i < this.textLen_; ++i) {
       if (this.charSet_.indexOf(this.textString_[i]) === -1) {
-        this.charSet_.push(this.textString_[i]);
+        this.charSet_.push(this.textString_[i]);      
       }
     }
     this.charSetSize_ = this.charSet_.length;
@@ -215,6 +266,13 @@ export class TextData {
    * Convert all training text to integer indices.
    */
   convertAllTextToIndices_() {
+    /*
+    var textExamples = ""
+    for(let le = 0; le < this.textlist.length;le++)
+    {
+      textExamples = textExamples + this.textlist[le]
+    }
+    */
     this.indices_ = new Uint16Array(this.textToIndices(this.textString_));
   }
 
@@ -229,9 +287,9 @@ export class TextData {
         i += this.sampleStep_) {
       this.exampleBeginIndices_.push(i);
     }
-
+    this.exampleBeginIndices_ = JSON.parse(JSON.stringify(this.textlist))
     // Randomly shuffle the beginning indices.
-    tf.util.shuffle(this.exampleBeginIndices_);
+    tf.util.shuffle(this.textlist);
     this.examplePosition_ = 0;
   }
 }
