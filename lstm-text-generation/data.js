@@ -98,7 +98,17 @@ export class TextData {
     var test = this.textString_
     test.replace(" ","")
     test.replace("_","")
-    this.textlist = test.split(/[\n\t:]/)
+    test = test.split(/[\n\t:。]/)
+    for (var i =  test.length -1;i >= 0 ;i--) {
+      if ( test[i] == "") {
+        test.splice(i,1);        //执行后aa.length会减一
+      }
+      else if(test[i].indexOf("，")!=-1)
+      {
+        test[i] = test[i] + "。"
+      }
+    }
+    this.textlist = test
   }
 
 
